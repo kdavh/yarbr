@@ -1,0 +1,39 @@
+{
+  "globals": {
+    "ts-jest": {
+      "enableTsDiagnostics": true,
+      "tsConfigFile": "test-tsconfig.json"
+    }
+  },
+  "testPathIgnorePatterns": [
+    "node_modules"
+  ],
+  "transform": {
+    "(src|__tests__)/.*\\.jsx?": "<rootDir>/node_modules/babel-jest",
+    "(src|__tests__)/.*\\.tsx?": "<rootDir>/node_modules/ts-jest"
+  },
+  "moduleNameMapper": {
+  },
+  "testRegex": "(/__tests__/.*|/src/.*\\.test)\\.(ts|js|jsx)x?$",
+  "moduleFileExtensions": [
+    "ts",
+    "tsx",
+    "js",
+    "json"
+  ],
+  "moduleDirectories": [
+    "node_modules"
+  ],
+  "setupFiles": ["./test-setup.js"],
+  "collectCoverageFrom": [
+    "src/{js,ts}/**/*.{js,jsx,ts,tsx}"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "statements": 18,
+      "branches": 12,
+      "lines": 18,
+      "functions": 28
+    }
+  }
+}

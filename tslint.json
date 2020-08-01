@@ -1,0 +1,102 @@
+{
+  "extends": ["tslint:recommended", "tslint-react"],
+  "rulesDirectory": "./node_modules/tslint-eslint-rules/dist/rules",
+  "jsRules": {
+    "indent": [
+      true,
+      "tabs"
+    ],
+    "object-literal-sort-keys": false,
+    "quotemark": [
+      true,
+      "avoid-escape",
+      "jsx-double",
+      "single"
+    ]
+  },
+  "rules": {
+    "array-type": [
+      true,
+      "generic"
+    ],
+    "indent": [
+      true,
+      "tabs"
+    ],
+    "interface-name": false,
+    "interface-over-type-literal": false,
+    "jsdoc-format": true,
+    "jsx-no-lambda": false,
+    "jsx-no-multiline-js": false,
+    "max-classes-per-file": [
+      true,
+      1
+    ],
+    "member-ordering": [
+      true,
+      {
+        "order": [
+          "public-static-field",
+          "protected-static-field",
+          "private-static-field",
+          "public-instance-field",
+          "protected-instance-field",
+          "private-instance-field",
+          "public-static-method",
+          "protected-static-method",
+          "private-static-method",
+          "public-constructor",
+          "protected-constructor",
+          "private-constructor",
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
+        ]
+      }
+    ],
+    "no-consecutive-blank-lines": [
+      true,
+      2
+    ],
+    "no-duplicate-switch-case": true,
+    "no-duplicate-variable": true,
+    "no-empty": false,
+    "no-implicit-dependencies": false,
+    "no-irregular-whitespace": true,
+    "no-submodule-imports": false,
+    "no-unnecessary-callback-wrapper": true,
+    "no-unused-expression": [
+      true,
+      "allow-fast-null-checks"
+    ],
+    "no-unused-variable": true,
+    "no-var-requires": false,
+    "object-literal-shorthand": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": [
+      {
+        "import-sources-order": "any",
+        "named-imports-order": "any"
+      },
+      true
+    ],
+    "prefer-method-signature": true,
+    "quotemark": [
+      true,
+      "avoid-escape",
+      "jsx-double",
+      "single"
+    ],
+    "semicolon": [
+      true,
+      "always"
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-pascal-case",
+      "allow-leading-underscore"
+    ]
+  }
+}
