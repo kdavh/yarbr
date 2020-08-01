@@ -1,13 +1,13 @@
-import {pick, merge} from 'lodash';
-import * as React from 'react';
-import {Promise} from 'es6-promise';
-import {Route, BrowserRouter} from 'react-router-dom';
 import {mount} from 'enzyme';
+import {pick, merge} from 'lodash';
 
 import {combineReducers, createStore, applyMiddleware, compose} from 'redux';
-import {connect, Provider} from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
+import * as React from 'react';
+import {connect, Provider} from 'react-redux';
+import {Route, BrowserRouter} from 'react-router-dom';
 import {routerReducer} from 'react-router-redux';
+
 import {actionReducer, asyncRequest, RexModule, thunkCreator} from '../src/ts/index';
 
 const initialState = {

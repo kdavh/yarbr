@@ -1,6 +1,8 @@
 {
   "name": "redux-rex",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "author": "kdavh",
+  "license": "ISC",
   "main": "./dist/index.js",
   "types": "./dist/RexModule.d.ts",
   "repository": "git@github.com:kdavh/redux-rex.git",
@@ -10,8 +12,7 @@
   ],
   "scripts": {
     "prebuild": "rm -rf dist",
-    "local:tsc": "./node_modules/.bin/tsc",
-    "build": "npm run local:tsc --declaration",
+    "build": "npx tsc",
     "test": "npx jest",
     "lint": "npx eslint . --ext .ts,.tsx"
   },
@@ -19,18 +20,18 @@
     "Redux"
   ],
   "dependencies": {
-    "es6-promise": "^4.2.4",
-    "lodash": "^4.17.4"
+    "lodash": "^4.12.0"
   },
-  "author": "kdavh",
-  "license": "ISC",
+  "peerDependencies": {
+      "redux": "^4.0.0",
+      "redux-thunk": "^2.3.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.0",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
     "@types/enzyme": "^3.10.5",
-    "@types/es6-promise": "^3.3.0",
     "@types/history": "^4.7.7",
     "@types/jest": "^26.0.8",
     "@types/lodash": "^4.6.6",
