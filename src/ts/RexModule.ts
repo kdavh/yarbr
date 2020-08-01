@@ -1,4 +1,4 @@
-import {ActionCreator} from 'redux';
+import {ActionCreator, AnyAction} from 'redux';
 import {merge} from 'lodash';
 
 export interface RexAction {
@@ -16,7 +16,7 @@ type ThunkCreator = (...args: Array<any>) => ThunkAction;
 export class RexModule {
 	public initialState: ReduxState;
 
-	private _actionCreators: {[key: string]: ThunkCreator | ActionCreator<RexAction>};
+	private _actionCreators: {[key: string]: ThunkCreator | ActionCreator<RexAction | AnyAction>};
 	private _types: {[key: string]: string};
 	private _reducerMap: {[key: string]: SingleReducer};
 
@@ -156,14 +156,18 @@ export function asyncRequest(targetClass, dataNamespace) {
 	targetClass[loadingActionCreatorName] = (state) =>
 		merge({}, state, {[dataNamespace]: {
 				isLoading: true,
+				isLoaded: false,
+				hasFailed: false,
+				data: undefined,
+				error: undefined,
 			}});
 	actionReducer(targetClass, loadingActionCreatorName);
 
 	targetClass[successActionCreatorName] = (state, action) =>
 		merge({}, state, {[dataNamespace]: {
 			isLoading: false,
-			hasFailed: false,
 			isLoaded: true,
+			hasFailed: false,
 			data: action.payload,
 		}});
 	actionReducer(targetClass, successActionCreatorName);
@@ -171,8 +175,8 @@ export function asyncRequest(targetClass, dataNamespace) {
 	targetClass[errorActionCreatorName] = (state, action) =>
 		merge({}, state, {[dataNamespace]: {
 			isLoading: false,
-			hasFailed: true,
 			isLoaded: true,
+			hasFailed: true,
 			error: action.payload.message,
 		}});
 	actionReducer(targetClass, errorActionCreatorName);
