@@ -52,7 +52,7 @@ describe('RexModule', () => {
 
 	beforeEach(() => {
 		brontosaurusModule = new BrontosaurusModule(brontosaurusInitialState);
-		// appStore = createStore(brontosaurusModule.reducer, undefined, storeEnhancers);
+		appStore = createStore(brontosaurusModule.reducer, undefined, storeEnhancers);
 		promiseSettler = new EventEmitter();
 		dataResolvePromise = new Promise(
 			(resolve, _) => {
