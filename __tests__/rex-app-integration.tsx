@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {pick, merge} from 'lodash';
 import * as React from 'react';
 import {Promise} from 'es6-promise';
 import {Route, BrowserRouter} from 'react-router-dom';
@@ -24,7 +24,7 @@ class CounterModule extends RexModule {
 
 	@actionReducer
 	public updateCounter(state, action) {
-		return _.merge({}, state, {
+		return merge({}, state, {
 			counter: state.counter + action.payload,
 		});
 	}
@@ -54,12 +54,12 @@ const CounterComponent = ({counter, myData, myDataRequest, updateCounter, update
 
 const CounterContainer = connect(
 	(state) => {
-		return _.pick(state[module1.namespace], [
+		return pick(state[module1.namespace], [
 			'counter',
 			'myData',
 		]);
 	},
-	_.pick(module1.actionCreators, [
+	pick(module1.actionCreators, [
 		'updateCounter',
 		'updateCounterThunk',
 		'myDataRequest',

@@ -60,3 +60,10 @@ A mini dinosaur with tiny arms. Also a tiny library to reduce boilerplate when w
 - install npm https://nodejs.org/en/
 - install npx `npm install -g npx`
 
+#### Run tests
+
+`npm test`
+
+#### Build
+
+`npm run build`

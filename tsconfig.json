@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./lib",
+    "outDir": "./dist",
     "sourceMap": true,
     "module": "es6",
     "target": "es5",
@@ -10,13 +10,14 @@
     "noImplicitAny": false,
     "moduleResolution": "node",
     "noUnusedParameters": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "./src/ts/**/*",
-    "./__tests__/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

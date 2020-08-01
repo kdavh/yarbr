@@ -1,9 +1,18 @@
 module.exports = {
   preset: 'ts-jest',
+  globals: {
+    'ts-jest': {
+      tsConfig: 'tsconfig.test.json'
+    }
+  },
   testEnvironment: 'jsdom',
-  "setupFiles": ["./test-setup.js"],
-  "testPathIgnorePatterns": [
-    "__mocks__"
+  modulePathIgnorePatterns: [
+    "dist"
+  ],
+  setupFiles: ["<rootDir>/__tests__/setup.js"],
+  testPathIgnorePatterns: [
+    "<rootDir>/__tests__/__mocks__",
+    '<rootDir>/__tests__/setup.js'
   ],
   transform: {"\\.ts$": ['ts-jest']},
   "collectCoverageFrom": [

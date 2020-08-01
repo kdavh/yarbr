@@ -1,17 +1,19 @@
 {
   "name": "redux-rex",
   "version": "1.0.0",
-  "main": "./lib/index.js",
-  "types": "./lib/RexModule.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/RexModule.d.ts",
   "repository": "git@github.com:kdavh/redux-rex.git",
   "files": [
-    "lib",
+    "dist",
     "typings"
   ],
   "scripts": {
-    "prebuild": "rm -rf lib",
+    "prebuild": "rm -rf dist",
     "local:tsc": "./node_modules/.bin/tsc",
-    "build": "npm run local:tsc --declaration"
+    "build": "npm run local:tsc --declaration",
+    "test": "npx jest",
+    "lint": "npx eslint . --ext .ts,.tsx"
   },
   "keywords": [
     "Redux"
@@ -29,15 +31,19 @@
     "@babel/preset-typescript": "^7.10.4",
     "@types/enzyme": "^3.10.5",
     "@types/es6-promise": "^3.3.0",
+    "@types/history": "^4.7.7",
     "@types/jest": "^26.0.8",
-    "@types/lodash.merge": "^4.6.6",
+    "@types/lodash": "^4.6.6",
     "@types/node": "^14.0.27",
     "@types/react": "^16.9.44",
-    "@types/react-router": "^5.1.8",
+    "@types/react-router-dom": "^5.1.5",
+    "@typescript-eslint/eslint-plugin": "^3.7.1",
+    "@typescript-eslint/parser": "^3.7.1",
     "babel-jest": "^26.2.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
-    "history": "^5.0.0",
+    "eslint": "^7.6.0",
+    "history": "^4.10.0",
     "jest": "^26.2.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
