@@ -36,7 +36,7 @@ class CounterModule extends RexModule {
 
 	@asyncRequest
 	public myData(arg1, arg2) {
-		return Promise.resolve({data: `amazing data with args: ${arg1} ${arg2}`});
+		return Promise.resolve(`amazing data with args: ${arg1} ${arg2}`);
 	}
 }
 const module1 = new CounterModule(initialState);

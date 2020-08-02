@@ -1,6 +1,5 @@
 import {ActionCreator, AnyAction, Action} from 'redux';
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
-import {merge} from 'lodash';
 
 export interface RexAction {
 	type: string;
@@ -135,6 +134,14 @@ export function thunkCreator(targetClass, thunkCreatorName) {
 // will update the `state.myData.isLoading` to be `true`
 //
 // NOTE: requests are deduped: later requests are not started if there is currently a request loading
+const requestInitState = {
+	isLoading: false,
+	isLoaded: false,
+	hasFailed: false,
+	data: undefined,
+	error: undefined,
+}
+
 export function asyncRequest(targetClass, dataNamespace) {
 	const requestActionCreatorName = `${dataNamespace}Request`;
 	const loadingActionCreatorName = `_${dataNamespace}Loading`;
@@ -153,40 +160,42 @@ export function asyncRequest(targetClass, dataNamespace) {
 
 		dispatch(targetClass.actionCreators[loadingActionCreatorName]());
 		return promiseCreator(...promiseCreatorArgs).then((resp) => {
-			dispatch(targetClass.actionCreators[successActionCreatorName](resp.data));
+			dispatch(targetClass.actionCreators[successActionCreatorName](resp));
 			return resp;
 		}).catch((error) => {
 			dispatch(targetClass.actionCreators[errorActionCreatorName](error));
-			return Promise.reject(error);
+			// return Promise.reject(error);
 		});
 	};
 	thunkCreator(targetClass, requestActionCreatorName);
 
-	targetClass[loadingActionCreatorName] = (state) =>
-		merge({}, state, {[dataNamespace]: {
-				isLoading: true,
-				isLoaded: false,
-				hasFailed: false,
-				data: undefined,
-				error: undefined,
-			}});
+	targetClass[loadingActionCreatorName] = (state) => ({
+		...state,
+		[dataNamespace]: {
+			...requestInitState,
+			isLoading: true,
+		}
+	});
 	actionReducer(targetClass, loadingActionCreatorName);
 
-	targetClass[successActionCreatorName] = (state, action) =>
-		merge({}, state, {[dataNamespace]: {
-			isLoading: false,
+	targetClass[successActionCreatorName] = (state, action) => ({
+		...state,
+		[dataNamespace]: {
+			...requestInitState,
 			isLoaded: true,
-			hasFailed: false,
 			data: action.payload,
-		}});
+		}
+	});
 	actionReducer(targetClass, successActionCreatorName);
 
-	targetClass[errorActionCreatorName] = (state, action) =>
-		merge({}, state, {[dataNamespace]: {
-			isLoading: false,
+	targetClass[errorActionCreatorName] = (state, action) => ({
+		...state,
+		[dataNamespace]: {
+			...requestInitState,
 			isLoaded: true,
-			hasFailed: true,
-			error: action.payload.message,
-		}});
+			isError: true,
+			error: action.payload,
+		}
+	});
 	actionReducer(targetClass, errorActionCreatorName);
 }
