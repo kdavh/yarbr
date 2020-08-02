@@ -59,11 +59,13 @@ const CounterContainer = connect(
 			'myData',
 		]);
 	},
-	pick(module1.actionCreators, [
-		'updateCounter',
+	{...pick(module1.actionCreators, [
+		'updateCounter'
+	]),...pick(module1.thunkCreators, [
 		'updateCounterThunk',
 		'myDataRequest',
-	]),
+	])
+	},
 )(CounterComponent);
 
 const appReducer = combineReducers({

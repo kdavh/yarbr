@@ -1,25 +1,23 @@
 import {EventEmitter} from 'events';
 import {merge} from 'lodash';
 
-import {createStore, applyMiddleware, compose, Store} from 'redux';
-import thunkMiddleware from 'redux-thunk';
+import {createStore, applyMiddleware, compose, Store, Action} from 'redux';
+import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk';
 
-import {RexModule, actionReducer, asyncRequest, thunkCreator, RexAction} from '../src/ts/RexModule';
+import {RexModule, actionReducer, asyncRequest, thunkCreator, RexAction, RexThunkDispatch} from '../src/ts/RexModule';
 
 const BRONTO_NAMESPACE = 'brontosaurus';
 const EVENT_RESOLVE = 'resolve';
 const EVENT_REJECT = 'reject';
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const storeEnhancers = composeEnhancers(applyMiddleware(thunkMiddleware));
+const storeEnhancers = composeEnhancers(applyMiddleware(thunkMiddleware as  ThunkMiddleware<any, Action>));
 
 describe('RexModule', () => {
 	let promiseSettler: EventEmitter;
 	let dataResolvePromise: Promise<void>;
 	let dataRejectPromise: Promise<void>;
-	let dataRequestValue1: Number;
-	let dataRequestValue2: Number;
-	let appStore: Store;
+	let appStore: Store<any> & { dispatch: RexThunkDispatch	};
 	let dispatchedEvents: Array<RexAction>;
 
 	class BrontosaurusModule extends RexModule {
@@ -50,7 +48,7 @@ describe('RexModule', () => {
 	const brontosaurusInitialState = {
 		stomachContents: [],
 	};
-	let brontosaurusModule;
+	let brontosaurusModule: RexModule;
 
 	beforeEach(() => {
 		dispatchedEvents = [];
@@ -94,12 +92,12 @@ describe('RexModule', () => {
 	});
 
 	it('stores thunk action creators as-is', () => {
-		expect(typeof brontosaurusModule.actionCreators.delayedFood).toEqual('function');
+		expect(typeof brontosaurusModule.thunkCreators.delayedFood).toEqual('function');
 	});
 
 	it('allows thunk to access to other action creators', () => {
 		const dispatchMock: jest.Mock = jest.fn();
-		brontosaurusModule.actionCreators.delayedFood('palm tree')(dispatchMock);
+		brontosaurusModule.thunkCreators.delayedFood('palm tree')(dispatchMock, null, null);
 
 		expect(dispatchMock).toBeCalledWith(brontosaurusModule.actionCreators.eatFood('palm tree'));
 	});
@@ -107,7 +105,7 @@ describe('RexModule', () => {
 	it('handles async requests', () => {
 		const dispatchMock: jest.Mock = jest.fn();
 		const getStateMock: jest.Mock = jest.fn().mockImplementation(() => ({}));
-		const testPromise = brontosaurusModule.actionCreators.destinyDataRequest(2, 3)(dispatchMock, getStateMock)
+		const testPromise = brontosaurusModule.thunkCreators.destinyDataRequest(2, 3)(dispatchMock, getStateMock, null)
 			.then((result) => {
 				expect(result).toEqual(6);
 			});
@@ -121,7 +119,7 @@ describe('RexModule', () => {
 		appStore.subscribe(() => {
 			dispatchedEvents = [...dispatchedEvents, appStore.getState()];
 		})
-		const testPromise = appStore.dispatch(brontosaurusModule.actionCreators.destinyDataRequest(2, 3))
+		const testPromise = appStore.dispatch(brontosaurusModule.thunkCreators.destinyDataRequest(2, 3))
 			.then((result) => {
 				expect(result).toEqual(6);
 				expect(dispatchedEvents[0]['destinyData']).toEqual(

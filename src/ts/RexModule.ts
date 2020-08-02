@@ -1,4 +1,5 @@
-import {ActionCreator, AnyAction} from 'redux';
+import {ActionCreator, AnyAction, Action} from 'redux';
+import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {merge} from 'lodash';
 
 export interface RexAction {
@@ -8,15 +9,18 @@ export interface RexAction {
 
 export type ReduxState = Exclude<any, undefined>;
 
-type ThunkAction = (dispatch: (action: any) => any, getState: () => any) => any;
+// ugly https://github.com/reduxjs/redux-thunk/issues/213#issuecomment-603392173
+type RexThunkAction<R> = ThunkAction<R, any, undefined, Action>;
+
+export type RexThunkDispatch = ThunkDispatch<any, undefined, Action>;
 
 type SingleReducer = (state: any, action?: RexAction, globalState?: any) => Exclude<any, undefined>;
-type ThunkCreator = (...args: Array<any>) => ThunkAction;
-
+type ThunkCreator = (...args: Array<any>) => RexThunkAction<any>;
 export class RexModule {
 	public initialState: ReduxState;
 
-	private _actionCreators: {[key: string]: ThunkCreator | ActionCreator<RexAction | AnyAction>};
+	private _actionCreators: {[key: string]: ActionCreator<RexAction>};
+	private _thunkCreators: {[key: string]: ThunkCreator};
 	private _types: {[key: string]: string};
 	private _reducerMap: {[key: string]: SingleReducer};
 
@@ -42,6 +46,11 @@ export class RexModule {
 	public get actionCreators() {
 		this._actionCreators = this._actionCreators || {};
 		return this._actionCreators;
+	}
+
+	public get thunkCreators() {
+		this._thunkCreators = this._thunkCreators || {};
+		return this._thunkCreators;
 	}
 
 	public get types() {
@@ -91,7 +100,7 @@ export function actionReducer(targetClass, actionCreatorName) {
 // takes the thunk action creator function exactly as defined,
 // but puts it with the rest of the action creators: `myModule.actionCreators.myThunkCreator`
 export function thunkCreator(targetClass, thunkCreatorName) {
-	targetClass.actionCreators[thunkCreatorName] = targetClass[thunkCreatorName].bind(targetClass);
+	targetClass.thunkCreators[thunkCreatorName] = targetClass[thunkCreatorName].bind(targetClass);
 	delete targetClass[thunkCreatorName];
 }
 
