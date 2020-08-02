@@ -128,7 +128,7 @@ export function thunkCreator(targetClass, thunkCreatorName) {
 // }
 // ```
 // the reducer created will update the namespace `myData` with this information:
-// `{isLoading: boolean, hasFailed: boolean, isLoaded: boolean, data: any, error: string?}`
+// `{isLoading: boolean, isError: boolean, isLoaded: boolean, data: any}`
 // for example:
 // `dispatch(myModule.actionCreators.myDataLoading)` (which is done inside `myModule.actionCreators.myDataRequest`)
 // will update the `state.myData.isLoading` to be `true`
@@ -137,9 +137,8 @@ export function thunkCreator(targetClass, thunkCreatorName) {
 const requestInitState = {
 	isLoading: false,
 	isLoaded: false,
-	hasFailed: false,
+	isError: false,
 	data: undefined,
-	error: undefined,
 }
 
 export function asyncRequest(targetClass, dataNamespace) {
@@ -164,7 +163,7 @@ export function asyncRequest(targetClass, dataNamespace) {
 			return resp;
 		}).catch((error) => {
 			dispatch(targetClass.actionCreators[errorActionCreatorName](error));
-			// return Promise.reject(error);
+			return Promise.reject(error);
 		});
 	};
 	thunkCreator(targetClass, requestActionCreatorName);
@@ -194,7 +193,7 @@ export function asyncRequest(targetClass, dataNamespace) {
 			...requestInitState,
 			isLoaded: true,
 			isError: true,
-			error: action.payload,
+			data: action.payload,
 		}
 	});
 	actionReducer(targetClass, errorActionCreatorName);

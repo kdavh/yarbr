@@ -1,5 +1,4 @@
 import {EventEmitter} from 'events';
-import {merge} from 'lodash';
 
 import {createStore, applyMiddleware, compose, Store, Action} from 'redux';
 import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk';
@@ -24,9 +23,10 @@ describe('RexModule', () => {
 		}
 		@actionReducer
 		public eatFood(state, action) {
-			return merge({}, state, {
+			return {
+				...state,
 				stomachContents: [...state.stomachContents, action.payload],
-			});
+			};
 		}
 
 		@thunkCreator
@@ -46,7 +46,7 @@ describe('RexModule', () => {
 		public failureData(arg1: number) {
 			return dataSettlePromise.then(() => {
 				appStore.dispatch(brontosaurusModule.actionCreators.eatFood('destiny dreams'));
-				throw new Error(String(arg1));
+				return Promise.reject(new Error(String(arg1)));
 			})
 		}
 	}
@@ -54,18 +54,16 @@ describe('RexModule', () => {
 	const brontosaurusInitialState = {
 		stomachContents: [],
 		destinyData: {
-			hasFailed: false,
+			isError: false,
 			isLoaded: false,
 			isLoading: false,
 			data: undefined,
-			error: undefined,
 		},
 		failureData: {
-			hasFailed: false,
+			isError: false,
 			isLoaded: false,
 			isLoading: false,
 			data: undefined,
-			error: undefined,
 		}
 	};
 	let brontosaurusModule: RexModule;
@@ -170,6 +168,7 @@ describe('RexModule', () => {
 			dispatchedEvents = [...dispatchedEvents, appStore.getState()];
 		})
 		const testPromise = appStore.dispatch(brontosaurusModule.thunkCreators.failureDataRequest(2))
+			.then(() => expect("you should").toEqual("never get here"))
 			.catch((error: Error) => {
 				expect(error.message).toEqual("2");
 				expect(dispatchedEvents[0]['failureData']).toEqual(
@@ -190,11 +189,12 @@ describe('RexModule', () => {
 					{
 						...brontosaurusInitialState.failureData,
 						isLoaded: true,
-						hasFailed: true,
-						error: "2",
+						isError: true,
+						data: new Error("2"),
 					}
 				);
 				expect(dispatchedEvents[2]['stomachContents']).toEqual(['destiny dreams']);
+				return Promise.resolve();
 			});
 
 		promiseSettler.emit(EVENT_SETTLE);

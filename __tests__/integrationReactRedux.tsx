@@ -1,5 +1,4 @@
 import {mount} from 'enzyme';
-import {pick, merge} from 'lodash';
 
 import {combineReducers, createStore, applyMiddleware, compose} from 'redux';
 import thunkMiddleware from 'redux-thunk';
@@ -24,9 +23,10 @@ class CounterModule extends RexModule {
 
 	@actionReducer
 	public updateCounter(state, action) {
-		return merge({}, state, {
+		return {
+			...state,
 			counter: state.counter + action.payload,
-		});
+		};
 	}
 
 	@thunkCreator
@@ -54,17 +54,13 @@ const CounterComponent = ({counter, myData, myDataRequest, updateCounter, update
 
 const CounterContainer = connect(
 	(state) => {
-		return pick(state[module1.namespace], [
-			'counter',
-			'myData',
-		]);
+		const {counter, myData} = state[module1.namespace];
+		return {counter, myData};
 	},
-	{...pick(module1.actionCreators, [
-		'updateCounter'
-	]),...pick(module1.thunkCreators, [
-		'updateCounterThunk',
-		'myDataRequest',
-	])
+	{
+		myDataRequest: module1.thunkCreators.myDataRequest,
+		updateCounter: module1.actionCreators.updateCounter,
+		updateCounterThunk: module1.thunkCreators.updateCounterThunk,
 	},
 )(CounterComponent);
 
@@ -99,6 +95,7 @@ describe('RexModule app integration', () => {
 		expect(app.find('h1').text()).toContain('Count: 1');
 		app.find('#buttonDataRequest').simulate('click');
 
+		process.nextTick
 		return new Promise((resolve) => {
 			// wait for next round of promise processing before expectation
 			resolve();
