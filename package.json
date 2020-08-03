@@ -1,14 +1,13 @@
 {
-  "name": "redux-rex",
+  "name": "yarbr",
   "version": "0.1.0",
   "author": "kdavh",
   "license": "ISC",
   "main": "./dist/index.js",
-  "types": "./dist/RexModule.d.ts",
-  "repository": "git@github.com:kdavh/redux-rex.git",
+  "types": "./dist/YarbrModule.d.ts",
+  "repository": "git@github.com:kdavh/yarbr.git",
   "files": [
-    "dist",
-    "typings"
+    "dist"
   ],
   "scripts": {
     "prebuild": "rm -rf dist",

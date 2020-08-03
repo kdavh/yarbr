@@ -1,14 +1,17 @@
-# Redux Rex
+# Yarbr
 
-A mini dinosaur with tiny arms. Also a tiny library to reduce boilerplate when writing redux reducers, actions, action creators.
+Yet another Redux boilerplate reducer.
+
+A tiny library to reduce boilerplate when writing redux reducers, actions, action creators.
 
 
 ### Install in your project:
-- `npm install redux-rex`
+- `npm install yarbr`
 
 
 ### Use in your app:
-- [**See example app integration test**](./__tests__/rex-app-integration.tsx) and [**unit tests**](./__tests__/RexModule.ts) or see below for a brief overview.
+
+- [**See example app integration test**](./__tests__/integrationReactRedux.tsx) and [**unit tests**](./__tests__/YarbrModule.ts) or see below for a brief overview.
 - The library provides a base module class, and a set of [decorator functions](http://www.typescriptlang.org/docs/handbook/decorators.html). In a nutshell, decorator functions are applied to class members like this:
     ```typescript
     function myDecoratorFunction(..) {...}
@@ -23,11 +26,11 @@ A mini dinosaur with tiny arms. Also a tiny library to reduce boilerplate when w
 - Our helper decorators are used like this:
     ```typescript
     import {ActionCreator} from 'redux';
-    import {RexModule, actionReducer} from '@console/wtb-redux-rex';
+    import {YarbrModule, actionReducer} from 'yarbr';
 
     const initialState = {...};
 
-    class MyModule extends RexModule {
+    class MyModule extends YarbrModule {
         public get namespace(): {
           return 'myReduxStateNamespace';
         }

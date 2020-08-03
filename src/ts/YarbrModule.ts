@@ -1,7 +1,7 @@
-import {ActionCreator, AnyAction, Action} from 'redux';
+import {ActionCreator, Action} from 'redux';
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 
-export interface RexAction {
+export interface YarbrAction {
 	type: string;
 	payload: any;
 }
@@ -9,16 +9,16 @@ export interface RexAction {
 export type ReduxState = Exclude<any, undefined>;
 
 // ugly https://github.com/reduxjs/redux-thunk/issues/213#issuecomment-603392173
-type RexThunkAction<R> = ThunkAction<R, any, undefined, Action>;
+type YarbrThunkAction<R> = ThunkAction<R, any, undefined, Action>;
 
-export type RexThunkDispatch = ThunkDispatch<any, undefined, Action>;
+export type YarbrThunkDispatch = ThunkDispatch<any, undefined, Action>;
 
-type SingleReducer = (state: any, action?: RexAction, globalState?: any) => Exclude<any, undefined>;
-type ThunkCreator = (...args: Array<any>) => RexThunkAction<any>;
-export class RexModule {
+type SingleReducer = (state: any, action?: YarbrAction, globalState?: any) => Exclude<any, undefined>;
+type ThunkCreator = (...args: Array<any>) => YarbrThunkAction<any>;
+export class YarbrModule {
 	public initialState: ReduxState;
 
-	private _actionCreators: {[key: string]: ActionCreator<RexAction>};
+	private _actionCreators: {[key: string]: ActionCreator<YarbrAction>};
 	private _thunkCreators: {[key: string]: ThunkCreator};
 	private _types: {[key: string]: string};
 	private _reducerMap: {[key: string]: SingleReducer};
@@ -34,7 +34,7 @@ export class RexModule {
 		throw new Error('Must define namespace getter in subclasses');
 	}
 
-	public reducer = (state: any, action: RexAction, globalState: any = undefined): any => {
+	public reducer = (state: any, action: YarbrAction, globalState: any = undefined): any => {
 		if (state === undefined) {
 			state = this.initialState;
 		}
@@ -64,11 +64,11 @@ export class RexModule {
 	}
 }
 
-// decorator functions for use inside a class extending RexModule
+// decorator functions for use inside a class extending YarbrModule
 
 // usage:
 // ```
-// class MyModule extends RexModule {
+// class MyModule extends YarbrModule {
 //   @actionReducer
 //   myActionCreator(state, action) {...}
 // }
@@ -91,7 +91,7 @@ export function actionReducer(targetClass, actionCreatorName) {
 
 // usage:
 // ```
-// class MyModule extends RexModule {
+// class MyModule extends YarbrModule {
 //   @thunkCreator
 //   myThunkCreator(value) { return (dispatch) => {...}}
 // }
@@ -105,7 +105,7 @@ export function thunkCreator(targetClass, thunkCreatorName) {
 
 // usage:
 // ```
-// class MyModule extends RexModule {
+// class MyModule extends YarbrModule {
 //   @asyncRequest
 //   myData(value) {/* return a promise */}
 // }
@@ -113,7 +113,7 @@ export function thunkCreator(targetClass, thunkCreatorName) {
 // a convenience decorator, equivalent to creating some functions like this
 // that handle the lifecycle of an http request or any promise-based request:
 // ```
-// class MyModule extends RexModule {
+// class MyModule extends YarbrModule {
 //   @thunkCreator
 //   myDataRequest(..) {...}
 //

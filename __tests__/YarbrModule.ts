@@ -3,21 +3,22 @@ import {EventEmitter} from 'events';
 import {createStore, applyMiddleware, compose, Store, Action} from 'redux';
 import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk';
 
-import {RexModule, actionReducer, asyncRequest, thunkCreator, RexAction, RexThunkDispatch} from '../src/ts/RexModule';
+import {YarbrModule, actionReducer, asyncRequest, thunkCreator, YarbrAction, YarbrThunkDispatch} from '../src/ts/YarbrModule';
 
 const BRONTO_NAMESPACE = 'brontosaurus';
-const EVENT_SETTLE = 'settle';
+const EVENT_SUCCEED = 'SUCCEED';
+const EVENT_FAIL = 'FAIL';
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const storeEnhancers = composeEnhancers(applyMiddleware(thunkMiddleware as  ThunkMiddleware<any, Action>));
 
-describe('RexModule', () => {
+describe('YarbrModule', () => {
 	let promiseSettler: EventEmitter;
 	let dataSettlePromise: Promise<void>;
-	let appStore: Store<any> & { dispatch: RexThunkDispatch	};
-	let dispatchedEvents: Array<RexAction>;
+	let appStore: Store<any> & {dispatch: YarbrThunkDispatch};
+	let dispatchedEvents: Array<YarbrAction>;
 
-	class BrontosaurusModule extends RexModule {
+	class BrontosaurusModule extends YarbrModule {
 		public get namespace() {
 			return BRONTO_NAMESPACE;
 		}
@@ -39,14 +40,9 @@ describe('RexModule', () => {
 			return dataSettlePromise.then(() => {
 				appStore.dispatch(brontosaurusModule.actionCreators.eatFood('destiny dreams'));
 				return `promise response data: ${arg1} * ${arg2} = ${arg1 * arg2}`;
-			})
-		}
-
-		@asyncRequest
-		public failureData(arg1: number) {
-			return dataSettlePromise.then(() => {
-				appStore.dispatch(brontosaurusModule.actionCreators.eatFood('destiny dreams'));
-				return Promise.reject(new Error(String(arg1)));
+			}).catch(() => {
+				appStore.dispatch(brontosaurusModule.actionCreators.eatFood('unmet hopes'));
+				throw new Error(String(arg1));
 			})
 		}
 	}
@@ -59,14 +55,8 @@ describe('RexModule', () => {
 			isLoading: false,
 			data: undefined,
 		},
-		failureData: {
-			isError: false,
-			isLoaded: false,
-			isLoading: false,
-			data: undefined,
-		}
 	};
-	let brontosaurusModule: RexModule;
+	let brontosaurusModule: YarbrModule;
 
 	beforeEach(() => {
 		dispatchedEvents = [];
@@ -74,8 +64,9 @@ describe('RexModule', () => {
 		appStore = createStore(brontosaurusModule.reducer, undefined, storeEnhancers);
 		promiseSettler = new EventEmitter();
 		dataSettlePromise = new Promise(
-			(resolve, _) => {
-				promiseSettler.on(EVENT_SETTLE, () => resolve());
+			(resolve, reject) => {
+				promiseSettler.on(EVENT_SUCCEED, () => resolve());
+				promiseSettler.on(EVENT_FAIL, () => reject());
 			}
 		);
 	});
@@ -115,7 +106,7 @@ describe('RexModule', () => {
 		expect(dispatchMock).toBeCalledWith(brontosaurusModule.actionCreators.eatFood('palm tree'));
 	});
 
-	it('handles async requests', () => {
+	it('handles successful async requests', () => {
 		const dispatchMock: jest.Mock = jest.fn();
 		const getStateMock: jest.Mock = jest.fn().mockImplementation(() => ({}));
 		const testPromise = brontosaurusModule.thunkCreators.destinyDataRequest(2, 3)(dispatchMock, getStateMock, null)
@@ -124,7 +115,7 @@ describe('RexModule', () => {
 			});
 
 
-		promiseSettler.emit(EVENT_SETTLE);
+		promiseSettler.emit(EVENT_SUCCEED);
 		return testPromise;
 	});
 
@@ -133,6 +124,7 @@ describe('RexModule', () => {
 			dispatchedEvents = [...dispatchedEvents, appStore.getState()];
 		})
 		const testPromise = appStore.dispatch(brontosaurusModule.thunkCreators.destinyDataRequest(2, 3))
+			.catch(() => expect("you should").toEqual("never get here"))
 			.then((result: Number) => {
 				expect(result).toEqual("promise response data: 2 * 3 = 6");
 				expect(dispatchedEvents[0]['destinyData']).toEqual(
@@ -159,7 +151,7 @@ describe('RexModule', () => {
 				expect(dispatchedEvents[2]['stomachContents']).toEqual(['destiny dreams']);
 			});
 
-		promiseSettler.emit(EVENT_SETTLE);
+		promiseSettler.emit(EVENT_SUCCEED);
 		return testPromise;
 	});
 
@@ -167,37 +159,37 @@ describe('RexModule', () => {
 		appStore.subscribe(() => {
 			dispatchedEvents = [...dispatchedEvents, appStore.getState()];
 		})
-		const testPromise = appStore.dispatch(brontosaurusModule.thunkCreators.failureDataRequest(2))
+		const testPromise = appStore.dispatch(brontosaurusModule.thunkCreators.destinyDataRequest(2))
 			.then(() => expect("you should").toEqual("never get here"))
 			.catch((error: Error) => {
 				expect(error.message).toEqual("2");
-				expect(dispatchedEvents[0]['failureData']).toEqual(
+				expect(dispatchedEvents[0]['destinyData']).toEqual(
 					{
-						...brontosaurusInitialState.failureData,
+						...brontosaurusInitialState.destinyData,
 						isLoading: true,
 					}
 				);
 				expect(dispatchedEvents[0]['stomachContents']).toEqual([]);
-				expect(dispatchedEvents[1]['failureData']).toEqual(
+				expect(dispatchedEvents[1]['destinyData']).toEqual(
 					{
-						...brontosaurusInitialState.failureData,
+						...brontosaurusInitialState.destinyData,
 						isLoading: true,
 					}
 				);
-				expect(dispatchedEvents[1]['stomachContents']).toEqual(['destiny dreams']);
-				expect(dispatchedEvents[2]['failureData']).toEqual(
+				expect(dispatchedEvents[1]['stomachContents']).toEqual(['unmet hopes']);
+				expect(dispatchedEvents[2]['destinyData']).toEqual(
 					{
-						...brontosaurusInitialState.failureData,
+						...brontosaurusInitialState.destinyData,
 						isLoaded: true,
 						isError: true,
 						data: new Error("2"),
 					}
 				);
-				expect(dispatchedEvents[2]['stomachContents']).toEqual(['destiny dreams']);
+				expect(dispatchedEvents[2]['stomachContents']).toEqual(['unmet hopes']);
 				return Promise.resolve();
 			});
 
-		promiseSettler.emit(EVENT_SETTLE);
+		promiseSettler.emit(EVENT_FAIL);
 		return testPromise;
 	});
 });

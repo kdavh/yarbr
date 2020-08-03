@@ -7,7 +7,7 @@ import {connect, Provider} from 'react-redux';
 import {Route, BrowserRouter} from 'react-router-dom';
 import {routerReducer} from 'react-router-redux';
 
-import {actionReducer, asyncRequest, RexModule, thunkCreator} from '../src/ts/index';
+import {actionReducer, asyncRequest, YarbrModule, thunkCreator} from '../src/ts/index';
 
 const initialState = {
 	counter: 0,
@@ -16,7 +16,7 @@ const initialState = {
 	},
 };
 
-class CounterModule extends RexModule {
+class CounterModule extends YarbrModule {
 	public get namespace() {
 		return 'counter';
 	}
@@ -85,7 +85,7 @@ const App = (
 	</Provider>
 );
 
-describe('RexModule app integration', () => {
+describe('YarbrModule app integration', () => {
 	it('should render a working app', () => {
 		const app = mount(App);
 

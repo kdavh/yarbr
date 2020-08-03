@@ -1,1 +1,1 @@
-export {RexModule, actionReducer, thunkCreator, asyncRequest} from './RexModule';
+export {YarbrModule, actionReducer, thunkCreator, asyncRequest} from './YarbrModule';
