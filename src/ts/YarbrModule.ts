@@ -1,20 +1,15 @@
 import {ActionCreator, Action} from 'redux';
-import {ThunkAction, ThunkDispatch} from 'redux-thunk';
+import {ThunkAction} from 'redux-thunk';
 
-export interface YarbrAction {
-	type: string;
+interface YarbrAction extends Action<string> {
 	payload: any;
 }
 
-export type ReduxState = Exclude<any, undefined>;
+type ReduxState = Exclude<any, undefined>;
 
-// ugly https://github.com/reduxjs/redux-thunk/issues/213#issuecomment-603392173
-type YarbrThunkAction<R> = ThunkAction<R, any, undefined, Action>;
-
-export type YarbrThunkDispatch = ThunkDispatch<any, undefined, Action>;
-
-type SingleReducer = (state: any, action?: YarbrAction, globalState?: any) => Exclude<any, undefined>;
-type ThunkCreator = (...args: Array<any>) => YarbrThunkAction<any>;
+type SingleReducer = (state: any, action?: Action<string>, globalState?: any) => ReduxState;
+// https://github.com/reduxjs/redux-thunk/issues/213#issuecomment-603392173
+type ThunkCreator = (...args: Array<any>) => ThunkAction<any, any, undefined, Action<string>>;
 export class YarbrModule {
 	public initialState: ReduxState;
 
@@ -34,7 +29,7 @@ export class YarbrModule {
 		throw new Error('Must define namespace getter in subclasses');
 	}
 
-	public reducer = (state: any, action: YarbrAction, globalState: any = undefined): any => {
+	public reducer = (state: any, action: Action<string>, globalState: any = undefined): ReduxState => {
 		if (state === undefined) {
 			state = this.initialState;
 		}

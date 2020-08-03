@@ -12,23 +12,15 @@ A tiny library to reduce boilerplate when writing redux reducers, actions, actio
 ### Use in your app:
 
 - [**See example app integration test**](./__tests__/integrationReactRedux.tsx) and [**unit tests**](./__tests__/YarbrModule.ts) or see below for a brief overview.
-- The library provides a base module class, and a set of [decorator functions](http://www.typescriptlang.org/docs/handbook/decorators.html). In a nutshell, decorator functions are applied to class members like this:
-    ```typescript
-    function myDecoratorFunction(..) {...}
+- The library provides a base module class, and a set of [decorator functions](http://www.typescriptlang.org/docs/handbook/decorators.html).
+- Example, [see how class and helpers are used](./__tests__/YarbrModule.ts)
+- Example, [see how it's used with react](./__tests__/integrationReactRedux.ts)
 
-    class MyClass {
-        // `@myDecoratorFunction` mutates how `myFunction` works
-        // or even where it lives on a `MyClass` object.
-        @myDecoratorFunction
-        myFunction() {...}
-    }
-    ```
-- Our helper decorators are used like this:
     ```typescript
     import {ActionCreator} from 'redux';
     import {YarbrModule, actionReducer} from 'yarbr';
 
-    const initialState = {...};
+    const initialState = {};
 
     class MyModule extends YarbrModule {
         public get namespace(): {

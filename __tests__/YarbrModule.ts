@@ -1,66 +1,66 @@
 import {EventEmitter} from 'events';
 
 import {createStore, applyMiddleware, compose, Store, Action} from 'redux';
-import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk';
+import thunkMiddleware, { ThunkMiddleware, ThunkDispatch } from 'redux-thunk';
 
-import {YarbrModule, actionReducer, asyncRequest, thunkCreator, YarbrAction, YarbrThunkDispatch} from '../src/ts/YarbrModule';
+import {YarbrModule, actionReducer, asyncRequest, thunkCreator} from '../src/ts/YarbrModule';
 
 const BRONTO_NAMESPACE = 'brontosaurus';
 const EVENT_SUCCEED = 'SUCCEED';
 const EVENT_FAIL = 'FAIL';
 
-const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const storeEnhancers = composeEnhancers(applyMiddleware(thunkMiddleware as  ThunkMiddleware<any, Action>));
+const brontosaurusInitialState = {
+	stomachContents: [],
+	destinyData: {
+		isError: false,
+		isLoaded: false,
+		isLoading: false,
+		data: undefined,
+	},
+};
 
-describe('YarbrModule', () => {
-	let promiseSettler: EventEmitter;
-	let dataSettlePromise: Promise<void>;
-	let appStore: Store<any> & {dispatch: YarbrThunkDispatch};
-	let stateSnapshots: Array<YarbrAction>;
+class BrontosaurusModule extends YarbrModule {
+	public get namespace() {
+		return BRONTO_NAMESPACE;
+	}
+	@actionReducer
+	public eatFood(state, action) {
+		return {
+			...state,
+			stomachContents: [...state.stomachContents, action.payload],
+		};
+	}
 
-	class BrontosaurusModule extends YarbrModule {
-		public get namespace() {
-			return BRONTO_NAMESPACE;
-		}
-		@actionReducer
-		public eatFood(state, action) {
-			return {
-				...state,
-				stomachContents: [...state.stomachContents, action.payload],
-			};
-		}
-
-		@thunkCreator
-		public eatMultipleFoods(food1, food2) {
-			return (dispatch) => {
-				dispatch(this.actionCreators.eatFood(food1));
-				dispatch(this.actionCreators.eatFood(food2));
-			}
-		}
-
-		@asyncRequest
-		public destinyData(arg1: number, arg2: number) {
-			return dataSettlePromise.then(() => {
-				appStore.dispatch(brontosaurusModule.actionCreators.eatFood('destiny dreams'));
-				return `promise response data: ${arg1} * ${arg2} = ${arg1 * arg2}`;
-			}).catch(() => {
-				appStore.dispatch(brontosaurusModule.actionCreators.eatFood('unmet hopes'));
-				throw new Error(String(arg1));
-			})
+	@thunkCreator
+	public eatMultipleFoods(food1, food2) {
+		return (dispatch) => {
+			dispatch(this.actionCreators.eatFood(food1));
+			dispatch(this.actionCreators.eatFood(food2));
 		}
 	}
 
-	const brontosaurusInitialState = {
-		stomachContents: [],
-		destinyData: {
-			isError: false,
-			isLoaded: false,
-			isLoading: false,
-			data: undefined,
-		},
-	};
-	let brontosaurusModule: YarbrModule;
+	@asyncRequest
+	public destinyData(arg1: number, arg2: number) {
+		return dataSettlePromise.then(() => {
+			appStore.dispatch(brontosaurusModule.actionCreators.eatFood('destiny dreams'));
+			return `promise response data: ${arg1} * ${arg2} = ${arg1 * arg2}`;
+		}).catch(() => {
+			appStore.dispatch(brontosaurusModule.actionCreators.eatFood('unmet hopes'));
+			throw new Error(String(arg1));
+		})
+	}
+}
 
+const storeEnhancers = compose(applyMiddleware(thunkMiddleware as ThunkMiddleware<any, Action<string>>));
+
+let promiseSettler: EventEmitter;
+let dataSettlePromise: Promise<void>;
+let appStore: Store<any> & {dispatch: ThunkDispatch<any, undefined, Action<string>>};
+let stateSnapshots: Array<any>;
+
+let brontosaurusModule: YarbrModule;
+
+describe('YarbrModule', () => {
 	beforeEach(() => {
 		brontosaurusModule = new BrontosaurusModule(brontosaurusInitialState);
 		stateSnapshots = [];
