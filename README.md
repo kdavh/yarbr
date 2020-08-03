@@ -4,15 +4,13 @@ Yet another Redux boilerplate reducer.
 
 A tiny library to reduce boilerplate when writing redux reducers, actions, action creators.
 
+Yarbr provides a base module class, and a set of [decorator functions](http://www.typescriptlang.org/docs/handbook/decorators.html).
 
 ### Install in your project:
 - `npm install yarbr`
 
-
 ### Use in your app:
 
-- [**See example app integration test**](./__tests__/integrationReactRedux.tsx) and [**unit tests**](./__tests__/YarbrModule.ts) or see below for a brief overview.
-- The library provides a base module class, and a set of [decorator functions](http://www.typescriptlang.org/docs/handbook/decorators.html).
 - Example, [see how class and helpers are used](./__tests__/YarbrModule.ts)
 - Example, [see how it's used with react](./__tests__/integrationReactRedux.tsx)
 - Example, if you don't like clicking links, see below:
