@@ -6,8 +6,6 @@
     "declarationDir": "./dist",
     "experimentalDecorators": true,
     "jsx": "react",
-    "module": "es6",
-    "moduleResolution": "node",
     "noImplicitAny": false,
     "noUnusedParameters": true,
     "outDir": "./dist",

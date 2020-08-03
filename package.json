@@ -1,6 +1,6 @@
 {
   "name": "yarbr",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "kdavh",
   "license": "ISC",
   "main": "./dist/index.js",
