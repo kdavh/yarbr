@@ -10,6 +10,7 @@
     "dist"
   ],
   "scripts": {
+    "prepublish": "npm run test && npm run build",
     "prebuild": "rm -rf dist",
     "build": "npx tsc --build tsconfig.build.json",
     "test": "npx jest",
