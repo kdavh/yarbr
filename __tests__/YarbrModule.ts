@@ -16,7 +16,7 @@ describe('YarbrModule', () => {
 	let promiseSettler: EventEmitter;
 	let dataSettlePromise: Promise<void>;
 	let appStore: Store<any> & {dispatch: YarbrThunkDispatch};
-	let dispatchedEvents: Array<YarbrAction>;
+	let stateSnapshots: Array<YarbrAction>;
 
 	class BrontosaurusModule extends YarbrModule {
 		public get namespace() {
@@ -31,8 +31,11 @@ describe('YarbrModule', () => {
 		}
 
 		@thunkCreator
-		public delayedFood(value) {
-			return (dispatch) => dispatch(this.actionCreators.eatFood(value));
+		public eatMultipleFoods(food1, food2) {
+			return (dispatch) => {
+				dispatch(this.actionCreators.eatFood(food1));
+				dispatch(this.actionCreators.eatFood(food2));
+			}
 		}
 
 		@asyncRequest
@@ -59,9 +62,14 @@ describe('YarbrModule', () => {
 	let brontosaurusModule: YarbrModule;
 
 	beforeEach(() => {
-		dispatchedEvents = [];
 		brontosaurusModule = new BrontosaurusModule(brontosaurusInitialState);
+		stateSnapshots = [];
+
 		appStore = createStore(brontosaurusModule.reducer, undefined, storeEnhancers);
+		appStore.subscribe(() => {
+			stateSnapshots = [...stateSnapshots, appStore.getState()];
+		})
+
 		promiseSettler = new EventEmitter();
 		dataSettlePromise = new Promise(
 			(resolve, reject) => {
@@ -96,59 +104,42 @@ describe('YarbrModule', () => {
 	});
 
 	it('stores thunk action creators as-is', () => {
-		expect(typeof brontosaurusModule.thunkCreators.delayedFood).toEqual('function');
+		expect(typeof brontosaurusModule.thunkCreators.eatMultipleFoods).toEqual('function');
 	});
 
 	it('allows thunk to access to other action creators', () => {
-		const dispatchMock: jest.Mock = jest.fn();
-		brontosaurusModule.thunkCreators.delayedFood('palm tree')(dispatchMock, null, null);
-
-		expect(dispatchMock).toBeCalledWith(brontosaurusModule.actionCreators.eatFood('palm tree'));
-	});
-
-	it('handles successful async requests', () => {
-		const dispatchMock: jest.Mock = jest.fn();
-		const getStateMock: jest.Mock = jest.fn().mockImplementation(() => ({}));
-		const testPromise = brontosaurusModule.thunkCreators.destinyDataRequest(2, 3)(dispatchMock, getStateMock, null)
-			.then((result) => {
-				expect(result).toEqual("promise response data: 2 * 3 = 6");
-			});
-
-
-		promiseSettler.emit(EVENT_SUCCEED);
-		return testPromise;
+		appStore.dispatch(brontosaurusModule.thunkCreators.eatMultipleFoods('palm tree', 'fig'))
+		expect(stateSnapshots[0]['stomachContents']).toEqual(['palm tree']);
+		expect(stateSnapshots[1]['stomachContents']).toEqual(['palm tree', 'fig']);
 	});
 
 	it('handles async requests', () => {
-		appStore.subscribe(() => {
-			dispatchedEvents = [...dispatchedEvents, appStore.getState()];
-		})
 		const testPromise = appStore.dispatch(brontosaurusModule.thunkCreators.destinyDataRequest(2, 3))
 			.catch(() => expect("you should").toEqual("never get here"))
 			.then((result: Number) => {
 				expect(result).toEqual("promise response data: 2 * 3 = 6");
-				expect(dispatchedEvents[0]['destinyData']).toEqual(
+				expect(stateSnapshots[0]['destinyData']).toEqual(
 					{
 						...brontosaurusInitialState.destinyData,
 						isLoading: true,
 					}
 				);
-				expect(dispatchedEvents[0]['stomachContents']).toEqual([]);
-				expect(dispatchedEvents[1]['destinyData']).toEqual(
+				expect(stateSnapshots[0]['stomachContents']).toEqual([]);
+				expect(stateSnapshots[1]['destinyData']).toEqual(
 					{
 						...brontosaurusInitialState.destinyData,
 						isLoading: true,
 					}
 				);
-				expect(dispatchedEvents[1]['stomachContents']).toEqual(['destiny dreams']);
-				expect(dispatchedEvents[2]['destinyData']).toEqual(
+				expect(stateSnapshots[1]['stomachContents']).toEqual(['destiny dreams']);
+				expect(stateSnapshots[2]['destinyData']).toEqual(
 					{
 						...brontosaurusInitialState.destinyData,
 						isLoaded: true,
 						data: "promise response data: 2 * 3 = 6",
 					}
 				);
-				expect(dispatchedEvents[2]['stomachContents']).toEqual(['destiny dreams']);
+				expect(stateSnapshots[2]['stomachContents']).toEqual(['destiny dreams']);
 			});
 
 		promiseSettler.emit(EVENT_SUCCEED);
@@ -156,28 +147,25 @@ describe('YarbrModule', () => {
 	});
 
 	it('handles failed async requests', () => {
-		appStore.subscribe(() => {
-			dispatchedEvents = [...dispatchedEvents, appStore.getState()];
-		})
 		const testPromise = appStore.dispatch(brontosaurusModule.thunkCreators.destinyDataRequest(2))
 			.then(() => expect("you should").toEqual("never get here"))
 			.catch((error: Error) => {
 				expect(error.message).toEqual("2");
-				expect(dispatchedEvents[0]['destinyData']).toEqual(
+				expect(stateSnapshots[0]['destinyData']).toEqual(
 					{
 						...brontosaurusInitialState.destinyData,
 						isLoading: true,
 					}
 				);
-				expect(dispatchedEvents[0]['stomachContents']).toEqual([]);
-				expect(dispatchedEvents[1]['destinyData']).toEqual(
+				expect(stateSnapshots[0]['stomachContents']).toEqual([]);
+				expect(stateSnapshots[1]['destinyData']).toEqual(
 					{
 						...brontosaurusInitialState.destinyData,
 						isLoading: true,
 					}
 				);
-				expect(dispatchedEvents[1]['stomachContents']).toEqual(['unmet hopes']);
-				expect(dispatchedEvents[2]['destinyData']).toEqual(
+				expect(stateSnapshots[1]['stomachContents']).toEqual(['unmet hopes']);
+				expect(stateSnapshots[2]['destinyData']).toEqual(
 					{
 						...brontosaurusInitialState.destinyData,
 						isLoaded: true,
@@ -185,7 +173,7 @@ describe('YarbrModule', () => {
 						data: new Error("2"),
 					}
 				);
-				expect(dispatchedEvents[2]['stomachContents']).toEqual(['unmet hopes']);
+				expect(stateSnapshots[2]['stomachContents']).toEqual(['unmet hopes']);
 				return Promise.resolve();
 			});
 
