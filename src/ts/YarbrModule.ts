@@ -1,7 +1,7 @@
 import {ActionCreator, Action} from 'redux';
 import {ThunkAction} from 'redux-thunk';
 
-interface YarbrAction extends Action<string> {
+export interface YarbrAction extends Action<string> {
 	payload: any;
 }
 
